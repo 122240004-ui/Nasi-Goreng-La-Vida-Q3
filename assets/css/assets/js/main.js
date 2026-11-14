@@ -1,0 +1,306 @@
+/**
+* Template Name: Instant
+* Template URL: https://bootstrapmade.com/newtemplate-bootstrap-website-template/
+* Updated: Jul 07 2025 with Bootstrap v5.3.7
+* Author: BootstrapMade.com
+* License: https://bootstrapmade.com/license/
+*/
+
+(function() {
+  "use strict";
+
+  /**
+   * Apply .scrolled class to the body as the page is scrolled down
+   */
+  function toggleScrolled() {
+    const selectBody = document.querySelector('body');
+    const selectHeader = document.querySelector('#header');
+    if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
+    window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
+  }
+
+  document.addEventListener('scroll', toggleScrolled);
+  window.addEventListener('load', toggleScrolled);
+
+ 
+
+/**
+ * Mobile nav toggle - La Vida
+ */
+const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
+
+function mobileNavToogle() {
+  const body = document.body;
+  const isOpen = body.classList.contains('mobile-nav-active');
+
+  // Atur kondisi menu
+  body.classList.toggle('mobile-nav-active', !isOpen);
+
+  // Atur ikon secara eksplisit
+  mobileNavToggleBtn.classList.toggle('bi-three-dots-vertical', isOpen);
+  mobileNavToggleBtn.classList.toggle('bi-x', !isOpen);
+
+  mobileNavToggleBtn.setAttribute('aria-expanded', String(!isOpen));
+}
+
+if (mobileNavToggleBtn) {
+  mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  mobileNavToggleBtn.setAttribute('role', 'button');
+  mobileNavToggleBtn.setAttribute('tabindex', '0');
+  mobileNavToggleBtn.setAttribute('aria-expanded', 'false');
+}
+
+
+  /**
+   * Hide mobile nav on same-page/hash links
+   */
+  document.querySelectorAll('#navmenu a').forEach(navmenu => {
+    navmenu.addEventListener('click', () => {
+      if (document.querySelector('.mobile-nav-active')) {
+        mobileNavToogle();
+      }
+    });
+
+  });
+
+  /**
+   * Toggle mobile nav dropdowns
+   */
+  document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
+    navmenu.addEventListener('click', function(e) {
+      e.preventDefault();
+      this.parentNode.classList.toggle('active');
+      this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
+      e.stopImmediatePropagation();
+    });
+  });
+
+  /**
+   * Scroll top button
+   */
+  let scrollTop = document.querySelector('.scroll-top');
+
+  function toggleScrollTop() {
+    if (scrollTop) {
+      window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
+    }
+  }
+  scrollTop.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
+  window.addEventListener('load', toggleScrollTop);
+  document.addEventListener('scroll', toggleScrollTop);
+
+  /**
+   * Animation on scroll function and init
+   */
+  function aosInit() {
+    AOS.init({
+      duration: 600,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false
+    });
+  }
+  window.addEventListener('load', aosInit);
+
+  /**
+   * Initiate glightbox
+   */
+  const glightbox = GLightbox({
+    selector: '.glightbox'
+  });
+
+  /**
+   * Initiate Pure Counter
+   */
+  new PureCounter();
+
+  /**
+   * Init typed.js
+   */
+  const selectTyped = document.querySelector('.typed');
+  if (selectTyped) {
+    let typed_strings = selectTyped.getAttribute('data-typed-items');
+    typed_strings = typed_strings.split(',');
+    new Typed('.typed', {
+      strings: typed_strings,
+      loop: true,
+      typeSpeed: 100,
+      backSpeed: 50,
+      backDelay: 2000
+    });
+  }
+
+  /**
+   * Init swiper sliders
+   */
+  function initSwiper() {
+    document.querySelectorAll(".init-swiper").forEach(function(swiperElement) {
+      let config = JSON.parse(
+        swiperElement.querySelector(".swiper-config").innerHTML.trim()
+      );
+
+      if (swiperElement.classList.contains("swiper-tab")) {
+        initSwiperWithCustomPagination(swiperElement, config);
+      } else {
+        new Swiper(swiperElement, config);
+      }
+    });
+  }
+
+  window.addEventListener("load", initSwiper);
+
+
+
+
+/* ==========================================
+   LA VIDA FAQ - DYNAMIC HEIGHT FIX
+========================================== */
+
+document.querySelectorAll('.lavida-faq .faq-item').forEach((item) => {
+
+  const header = item.querySelector('.faq-header');
+  const icon = item.querySelector('.faq-toggle');
+  const content = item.querySelector('.faq-content');
+
+  // Kondisi awal: semua tertutup
+  item.classList.remove('faq-active');
+  header.setAttribute('aria-expanded', 'false');
+  content.style.maxHeight = '0px';
+  icon.className = 'bi bi-plus-lg faq-toggle';
+
+  header.setAttribute('role', 'button');
+  header.setAttribute('tabindex', '0');
+
+  function toggleFAQ() {
+
+    const isOpen = item.classList.contains('faq-active');
+
+    // Tutup semua FAQ lainnya
+    document.querySelectorAll('.lavida-faq .faq-item').forEach((other) => {
+
+      other.classList.remove('faq-active');
+
+      other.querySelector('.faq-toggle').className =
+        'bi bi-plus-lg faq-toggle';
+
+      other.querySelector('.faq-header')
+        .setAttribute('aria-expanded', 'false');
+
+      other.querySelector('.faq-content').style.maxHeight = '0px';
+
+    });
+
+    // Buka FAQ yang dipilih
+    if (!isOpen) {
+
+      item.classList.add('faq-active');
+
+      icon.className = 'bi bi-dash-lg faq-toggle';
+
+      header.setAttribute('aria-expanded', 'true');
+
+      // Hitung tinggi berdasarkan isi sebenarnya
+      content.style.maxHeight = 'none';
+
+      const contentHeight = content.scrollHeight;
+
+      content.style.maxHeight = '0px';
+
+      requestAnimationFrame(() => {
+        content.style.maxHeight = (contentHeight + 30) + 'px';
+      });
+
+    }
+
+  }
+
+  header.addEventListener('click', toggleFAQ);
+
+  header.addEventListener('keydown', (e) => {
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleFAQ();
+    }
+
+  });
+
+});
+
+
+  /**
+   * Correct scrolling position upon page load for URLs containing hash links.
+   */
+  window.addEventListener('load', function(e) {
+    if (window.location.hash) {
+      if (document.querySelector(window.location.hash)) {
+        setTimeout(() => {
+          let section = document.querySelector(window.location.hash);
+          let scrollMarginTop = getComputedStyle(section).scrollMarginTop;
+          window.scrollTo({
+            top: section.offsetTop - parseInt(scrollMarginTop),
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+    }
+  });
+
+  /**
+   * Navmenu Scrollspy
+   */
+  let navmenulinks = document.querySelectorAll('.navmenu a');
+
+  function navmenuScrollspy() {
+    navmenulinks.forEach(navmenulink => {
+      if (!navmenulink.hash) return;
+      let section = document.querySelector(navmenulink.hash);
+      if (!section) return;
+      let position = window.scrollY + 200;
+      if (position >= section.offsetTop && position <= (section.offsetTop + section.offsetHeight)) {
+        document.querySelectorAll('.navmenu a.active').forEach(link => link.classList.remove('active'));
+        navmenulink.classList.add('active');
+      } else {
+        navmenulink.classList.remove('active');
+      }
+    })
+  }
+  window.addEventListener('load', navmenuScrollspy);
+  document.addEventListener('scroll', navmenuScrollspy);
+
+})();
+// =================================
+// MEET Q3 - INTERACTIVE REVEAL
+// =================================
+
+const q3RevealBtn = document.getElementById("q3RevealBtn");
+const q3Members = document.getElementById("q3Members");
+
+if (q3RevealBtn && q3Members) {
+
+  q3RevealBtn.addEventListener("click", function () {
+
+    const isVisible = q3Members.classList.toggle("is-visible");
+
+    this.classList.toggle("active", isVisible);
+
+    this.setAttribute("aria-expanded", isVisible);
+
+    if (isVisible) {
+      this.innerHTML =
+        'MEET THE TEAM — Q3 <i class="bi bi-chevron-down"></i>';
+    } else {
+      this.innerHTML =
+        'THE TEAM BEHIND THE PROJECT <i class="bi bi-chevron-down"></i>';
+    }
+
+  });
+
+}
